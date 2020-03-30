@@ -1,0 +1,11 @@
+extends layouts/main-layout.pug
+
+block content
+    main
+        if usersList.length > 0
+            h1 Flex users list
+            ul
+                each user in usersList
+                    li #{user.username}
+        else
+            h1 No users found
