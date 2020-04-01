@@ -17,7 +17,10 @@
   "devDependencies": {
     "nodemon": "^2.0.2"
   },
-  "nodemonConfig": {        
-    "ignore": ["data/products.json"]  
+  "nodemonConfig": {
+    "ignore": [
+      "data/products.json",
+      "data/cart.json"
+    ]
   }
 }
