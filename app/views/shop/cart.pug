@@ -1,1 +1,13 @@
 extends ../layouts/main-layout.pug
+
+block content
+    if products.length > 0
+        ul
+            each product in products
+                li 
+                    p #{product.productData.title} (#{product.qty})
+                    form(action="/cart-delete-item", method="POST")
+                        button.btn(type="submit") Delete
+                        input(type="hidden", value=product.productData.id, name="productId")
+    else
+        h1 No Products in Cart!
