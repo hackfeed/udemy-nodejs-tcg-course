@@ -21,4 +21,4 @@ block content
                 textarea(name="description", rows=5)#description #{editing === "true" ? product.description : ""}
                 button.btn(type="submit") #{editing === "true" ? "Update product" : "Add product"}
             if editing
-                input(type="hidden", value=product.id, name="productId")
+                input(type="hidden", value=product._id, name="productId")

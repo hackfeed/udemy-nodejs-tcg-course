@@ -5,10 +5,10 @@ block content
         ul
             each product in products
                 li 
-                    p #{product.title} (#{product.cartItem.quantity})
+                    p #{product.title} (#{product.quantity})
                     form(action="/cart-delete-item", method="POST")
                         button.btn(type="submit") Delete
-                        input(type="hidden", value=product.id, name="productId")
+                        input(type="hidden", value=product._id, name="productId")
         .centered
             form(action="/create-order", method="POST")
                 button.btn(type="submit") Order Now!

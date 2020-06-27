@@ -7,8 +7,8 @@ block content
         ul
             each order in orders
                 li
-                    h1 ##{order.id}
+                    h1 ##{order._id}
                     ul
-                        each item in order.products
-                            li #{item.title} (#{item.orderItem.quantity})
+                        each item in order.items
+                            li #{item.title} (#{item.quantity})
 
