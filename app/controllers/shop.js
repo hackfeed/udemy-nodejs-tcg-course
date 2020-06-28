@@ -1,7 +1,8 @@
 const Product = require("../models/product");
+const Order = require("../models/order");
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("shop/index", { prods: products, pageTitle: "Shop", path: "/" });
     })
@@ -9,7 +10,7 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("shop/product-list", {
         prods: products,
@@ -35,10 +36,12 @@ exports.getProduct = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   req.user
-    .getCart()
-    .then((products) =>
-      res.render("shop/cart", { pageTitle: "Your Cart", path: "/cart", products: products })
-    )
+    .populate("cart.items.productId")
+    .execPopulate()
+    .then((user) => {
+      const products = user.cart.items;
+      res.render("shop/cart", { pageTitle: "Your Cart", path: "/cart", products: products });
+    })
     .catch((err) => console.log(err));
 };
 
@@ -53,21 +56,35 @@ exports.postCart = (req, res, next) => {
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
   req.user
-    .deleteItemFromCart(prodId)
+    .removeFromCart(prodId)
     .then(() => res.redirect("/cart"))
     .catch((err) => console.log(err));
 };
 
 exports.postOrder = (req, res, next) => {
   req.user
-    .addOrder()
+    .populate("cart.items.productId")
+    .execPopulate()
+    .then((user) => {
+      const products = user.cart.items.map((i) => {
+        return { quantity: i.quantity, productData: { ...i.productId._doc } };
+      });
+      const order = new Order({
+        user: {
+          name: req.user.name,
+          userId: req.user,
+        },
+        products: products,
+      });
+      return order.save();
+    })
+    .then(() => req.user.clearCart())
     .then(() => res.redirect("/orders"))
     .catch((err) => console.log(err));
 };
 
 exports.getOrders = (req, res, next) => {
-  req.user
-    .getOrders()
+  Order.find({ "user.userId": req.user._id })
     .then((orders) =>
       res.render("shop/orders", { pageTitle: "Your Orders", path: "/orders", orders: orders })
     )

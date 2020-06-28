@@ -1,5 +1,18 @@
 const Product = require("../models/product");
 
+exports.getProducts = (req, res, next) => {
+  Product.find()
+    .populate("userId")
+    .then((products) => {
+      res.render("admin/products", {
+        prods: products,
+        pageTitle: "Admin Products",
+        path: "/admin/products",
+      });
+    })
+    .catch((err) => console.log(err));
+};
+
 exports.getAddProduct = (req, res, next) => {
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
@@ -13,7 +26,13 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const description = req.body.description;
   const price = req.body.price;
-  const product = new Product(title, price, description, imageUrl, null, req.user._id);
+  const product = new Product({
+    title: title,
+    price: price,
+    description: description,
+    imageUrl: imageUrl,
+    userId: req.user,
+  });
   product
     .save()
     .then(() => res.redirect("/admin/products"))
@@ -47,34 +66,21 @@ exports.postEditProduct = (req, res, next) => {
   const updatedImageUrl = req.body.imageUrl;
   const updatedPrice = req.body.price;
   const updatedDescription = req.body.description;
-  const product = new Product(
-    updatedTitle,
-    updatedPrice,
-    updatedDescription,
-    updatedImageUrl,
-    prodId
-  );
-  product
-    .save()
+  Product.findById(prodId)
+    .then((product) => {
+      product.title = updatedTitle;
+      product.price = updatedPrice;
+      product.description = updatedDescription;
+      product.imageUrl - updatedImageUrl;
+      return product.save();
+    })
     .then(() => res.redirect("/admin/products"))
     .catch((err) => console.log(err));
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteById(prodId)
+  Product.findByIdAndRemove(prodId)
     .then(() => res.redirect("/admin/products"))
-    .catch((err) => console.log(err));
-};
-
-exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
-    .then((products) => {
-      res.render("admin/products", {
-        prods: products,
-        pageTitle: "Admin Products",
-        path: "/admin/products",
-      });
-    })
     .catch((err) => console.log(err));
 };
