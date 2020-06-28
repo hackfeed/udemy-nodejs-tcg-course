@@ -20,10 +20,13 @@ html(lang="en")
                         a(href="/cart", class=(path === "/cart" ? "active" : "")) Cart
                     li.main-header__item
                         a(href="/orders", class=(path === "/orders" ? "active" : "")) Orders
+                    //- li.main-header__item
+                    //-     a(href="/admin/add-product", class=(path === "/admin/add-product" ? "active" : "")) Add Product
+                    //- li.main-header__item
+                    //-     a(href="/admin/products", class=(path === "/admin/products" ? "active" : "")) Admin Products
+                ul.main-header__item-list
                     li.main-header__item
-                        a(href="/admin/add-product", class=(path === "/admin/add-product" ? "active" : "")) Add Product
-                    li.main-header__item
-                        a(href="/admin/products", class=(path === "/admin/products" ? "active" : "")) Admin Products
+                        a(href="/login") Login
             
         nav.mobile-nav
             ul.mobile-nav__item-list
@@ -35,10 +38,14 @@ html(lang="en")
                     a(href="/cart", class=(path === "/cart" ? "active" : "")) Cart
                 li.mobile-nav__item
                     a(href="/orders", class=(path === "/orders" ? "active" : "")) Orders
+                //- li.mobile-nav__item
+                //-     a(href="/admin/add-product", class=(path === "/admin/add-product" ? "active" : "")) Add Product
+                //- li.mobile-nav__item
+                //-     a(href="/admin/products", class=(path === "/admin/products" ? "active" : "")) Admin Products
+            ul.mobile-nav__item-list
                 li.mobile-nav__item
-                    a(href="/admin/add-product", class=(path === "/admin/add-product" ? "active" : "")) Add Product
-                li.mobile-nav__item
-                    a(href="/admin/products", class=(path === "/admin/products" ? "active" : "")) Admin Products
+                    a(href="/login") Login
 
-        block content
+        main
+            block content
         script(src="/js/main.js")
