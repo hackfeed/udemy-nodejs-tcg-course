@@ -1,13 +1,19 @@
 const path = require("path");
 
 const express = require("express");
+const session = require("express-session");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const MongodbStore = require("connect-mongodb-session")(session);
 
 const errorController = require("./controllers/error");
 const User = require("./models/user");
 
 const app = express();
+const store = new MongodbStore({
+  uri: "mongodb://localhost:27017/shop",
+  collection: "sessions",
+});
 
 app.set("view engine", "pug");
 app.set("views", "views");
@@ -18,15 +24,9 @@ const authRoutes = require("./routes/auth");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
-
-app.use((req, res, next) => {
-  User.findById("5ef8c31a3873baa7e529a34e")
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => console.log(err));
-});
+app.use(
+  session({ secret: "mysecretflexing", resave: false, saveUninitialized: false, store: store })
+);
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);

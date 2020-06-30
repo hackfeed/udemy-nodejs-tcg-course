@@ -8,4 +8,5 @@ block content
             img(src=product.imageUrl, alt=product.title)
         h2 $#{product.price}
         p #{product.description}
-        include ../includes/add-to-cart.pug
+        if isAuthenticated
+            include ../includes/add-to-cart.pug
