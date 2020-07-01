@@ -28,11 +28,14 @@ html(lang="en")
                 ul.main-header__item-list
                     if !isAuthenticated
                         li.main-header__item
-                            a(href="/login", class=(path === "/login" ? "active" : "")) Login
+                            a(href="/signin", class=(path === "/signin" ? "active" : "")) Sign in
+                        li.main-header__item
+                            a(href="/signup", class=(path === "/signup" ? "active" : "")) Sign up
                     else
                         li.main-header__item
-                            form(action="/logout", method="post")
-                                button(type="submit") Logout
+                            form(action="/signout", method="post")
+                                input(type="hidden", name="_csrf", value=csrfToken)
+                                button(type="submit") Sign out
             
         nav.mobile-nav
             ul.mobile-nav__item-list
@@ -52,11 +55,14 @@ html(lang="en")
             ul.mobile-nav__item-list
                 if !isAuthenticated
                     li.mobile-nav__item
-                        a(href="/login", class=(path === "/login" ? "active" : "")) Login
+                        a(href="/signin", class=(path === "/signin" ? "active" : "")) Sign in
+                    li.mobile-nav__item
+                        a(href="/signup", class=(path === "/signup" ? "active" : "")) Sign up
                 else
                     li.mobile-nav__item
-                        form(action="/logout", method="post")
-                            button(type="submit") Logout
+                        form(action="/signout", method="post")
+                            input(type="hidden", name="_csrf", value=csrfToken)
+                            button(type="submit") Sign out
 
         main
             block content

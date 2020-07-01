@@ -13,9 +13,11 @@ block content
                     form(action="/cart-delete-item", method="POST")
                         button.btn.danger(type="submit") Delete
                         input(type="hidden", value=product.productId._id, name="productId")
+                        input(type="hidden", name="_csrf", value=csrfToken)
         hr
         .centered
             form(action="/create-order", method="POST")
                 button.btn(type="submit") Order Now!
+                input(type="hidden", name="_csrf", value=csrfToken)
     else
         h1 No Products in Cart!

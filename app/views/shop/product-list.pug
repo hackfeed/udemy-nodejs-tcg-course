@@ -4,21 +4,20 @@ block styles
     link(rel="stylesheet", href="/css/product.css")
 
 block content
-    main
-        if prods.length > 0
-            .grid
-                each product in prods
-                    article.card.product-item
-                        header.card__header
-                            h1.product__title #{product.title}
-                        .card__image
-                            img(src=product.imageUrl alt=product.title)
-                        .card__content
-                            h2.product__price $#{product.price}
-                            p.product__description #{product.description}
-                        .card__actions
-                            a.btn(href="/products/" + product._id) Details
-                            if isAuthenticated
-                                include ../includes/add-to-cart.pug
-        else
-            h1 No products
+    if prods.length > 0
+        .grid
+            each product in prods
+                article.card.product-item
+                    header.card__header
+                        h1.product__title #{product.title}
+                    .card__image
+                        img(src=product.imageUrl alt=product.title)
+                    .card__content
+                        h2.product__price $#{product.price}
+                        p.product__description #{product.description}
+                    .card__actions
+                        a.btn(href="/products/" + product._id) Details
+                        if isAuthenticated
+                            include ../includes/add-to-cart.pug
+    else
+        h1 No products
