@@ -4,6 +4,8 @@ block styles
     link(rel="stylesheet", href="/css/product.css")
 
 block content
+    if errorMessage
+        .user-message.user-message--error #{errorMessage}
     if prods.length > 0
         .grid
             each product in prods

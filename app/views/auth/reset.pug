@@ -7,13 +7,9 @@ block styles
 block content
     if errorMessage
         .user-message.user-message--error #{errorMessage}
-    form.login-form(action="/signin", method="POST")
+    form.login-form(action="/reset", method="POST")
         .form-control
             label(for="email") E-Mail
             input(type="email", name="email")#email
-        .form-control
-            label(for="password") Password
-            input(type="password", name="password")#password
-        button.btn(type="submit") Sign in
+        button.btn(type="submit") Reset password
         input(type="hidden", name="_csrf", value=csrfToken)
-        a.btn(href="/reset") Reset password

@@ -1,16 +1,19 @@
 const Product = require("../models/product");
+const User = require("../models/user");
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
-    .populate("userId")
-    .then((products) => {
-      res.render("admin/products", {
-        prods: products,
-        pageTitle: "Admin Products",
-        path: "/admin/products",
-      });
-    })
-    .catch((err) => console.log(err));
+  User.findById(req.session.user._id).then((user) => {
+    Product.find({ userId: user._id })
+      .populate("userId")
+      .then((products) => {
+        res.render("admin/products", {
+          prods: products,
+          pageTitle: "Admin Products",
+          path: "/admin/products",
+        });
+      })
+      .catch((err) => console.log(err));
+  });
 };
 
 exports.getAddProduct = (req, res, next) => {
@@ -68,19 +71,26 @@ exports.postEditProduct = (req, res, next) => {
   const updatedDescription = req.body.description;
   Product.findById(prodId)
     .then((product) => {
-      product.title = updatedTitle;
-      product.price = updatedPrice;
-      product.description = updatedDescription;
-      product.imageUrl - updatedImageUrl;
-      return product.save();
+      User.findById(req.session.user._id).then((user) => {
+        if (product.userId.toString() !== user._id.toString()) {
+          req.flash("error", "You are not allowed to edit this product");
+          return res.redirect("/");
+        }
+        product.title = updatedTitle;
+        product.price = updatedPrice;
+        product.description = updatedDescription;
+        product.imageUrl - updatedImageUrl;
+        return product.save().then(() => res.redirect("/admin/products"));
+      });
     })
-    .then(() => res.redirect("/admin/products"))
     .catch((err) => console.log(err));
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.findByIdAndRemove(prodId)
-    .then(() => res.redirect("/admin/products"))
-    .catch((err) => console.log(err));
+  User.findById(req.session.user._id).then((user) => {
+    Product.deleteOne({ userId: user.id, _id: prodId })
+      .then(() => res.redirect("/admin/products"))
+      .catch((err) => console.log(err));
+  });
 };
