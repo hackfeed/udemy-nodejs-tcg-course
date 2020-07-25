@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const { MailgunTransport } = require("mailgun-nodemailer-transport");
 const crypto = require("crypto");
+const { validationResult } = require("express-validator/check");
 
 const User = require("../models/user");
 
@@ -15,27 +16,38 @@ let transporter = nodemailer.createTransport(
 );
 
 exports.getSignin = (req, res, next) => {
-  let message = req.flash("error");
-  if (message.length) {
-    message = message[0];
-  } else {
-    message = null;
-  }
   res.render("auth/signin", {
     pageTitle: "Sign in",
     path: "/signin",
-    errorMessage: message,
+    errorMessage: "",
+    oldInput: { email: "", password: "" },
+    validationErrors: [],
   });
 };
 
 exports.postSignin = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/signin", {
+      pageTitle: "Sign in",
+      path: "/signin",
+      errorMessage: errors.array()[0].msg,
+      oldInput: { email: email, password: password },
+      validationErrors: errors.array(),
+    });
+  }
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
-        req.flash("error", "Invalid email or password.");
-        return res.redirect("/signin");
+        return res.status(422).render("auth/signin", {
+          pageTitle: "Sign in",
+          path: "/signin",
+          errorMessage: "User with given email is not found",
+          oldInput: { email: email, password: password },
+          validationErrors: [{ param: "email" }],
+        });
       }
       bcrypt
         .compare(password, user.password)
@@ -45,13 +57,23 @@ exports.postSignin = (req, res, next) => {
             req.session.user = user;
             return res.redirect("/");
           }
-          req.flash("error", "Invalid email or password.");
-          res.redirect("/signin");
+          return res.status(422).render("auth/signin", {
+            pageTitle: "Sign in",
+            path: "/signin",
+            errorMessage: "Invalid password",
+            oldInput: { email: email, password: password },
+            validationErrors: [{ param: "password" }],
+          });
         })
         .catch((err) => {
           console.log(err);
-          req.flash("error", "Invalid email or password.");
-          res.redirect("/signin");
+          return res.status(422).render("auth/signin", {
+            pageTitle: "Sign in",
+            path: "/signin",
+            errorMessage: "Invalid email or password",
+            oldInput: { email: email, password: password },
+            validationErrors: [{ param: "email" }, { param: "password" }],
+          });
         });
     })
     .catch((err) => console.log(err));
@@ -71,34 +93,42 @@ exports.getSignup = (req, res, next) => {
   } else {
     message = null;
   }
-  res.render("auth/signup", { pageTitle: "Sign up", path: "/signup", errorMessage: message });
+  res.render("auth/signup", {
+    pageTitle: "Sign up",
+    path: "/signup",
+    errorMessage: message,
+    oldInput: { email: "", password: "", confirmPassword: "" },
+    validationErrors: errors.array(),
+  });
 };
 
 exports.postSignup = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
-  User.findOne({ email: email })
-    .then((user) => {
-      if (user) {
-        req.flash("error", "User with given email already exists.");
-        return res.redirect("/signup");
-      }
-      return bcrypt
-        .hash(password, 12)
-        .then((hashedPass) => {
-          const newUser = new User({ email: email, password: hashedPass, cart: { items: [] } });
-          return newUser.save();
-        })
-        .then(() => {
-          res.redirect("/signin");
-          return transporter.sendMail({
-            to: email,
-            from: "hackfeedshop@noreply.com",
-            subject: "Signup succeeded!",
-            text: "You just signed up to my shop!",
-          });
-        });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/signup", {
+      pageTitle: "Sign up",
+      path: "/signup",
+      errorMessage: errors.array()[0].msg,
+      oldInput: { email: email, password: password, confirmPassword: req.body.confirmPassword },
+      validationErrors: errors.array(),
+    });
+  }
+  return bcrypt
+    .hash(password, 12)
+    .then((hashedPass) => {
+      const newUser = new User({ email: email, password: hashedPass, cart: { items: [] } });
+      return newUser.save();
+    })
+    .then(() => {
+      res.redirect("/signin");
+      return transporter.sendMail({
+        to: email,
+        from: "hackfeedshop@noreply.com",
+        subject: "Signup succeeded!",
+        text: "You just signed up to my shop!",
+      });
     })
     .catch((err) => console.log(err));
 };

@@ -5,20 +5,22 @@ block styles
     link(rel="stylesheet", href="/css/product.css")
 
 block content
-    form.product-form(action="/admin/" + (editing === "true" ? "edit-product" : "add-product"), method="POST")
+    if errorMessage
+        .user-message.user-message--error #{errorMessage}
+    form.product-form(action="/admin/" + (editing ? "edit-product" : "add-product"), method="POST")
         .form-control
             label(for="title") Title
-            input(type="text", name="title", value=(editing === "true" ? product.title : ""))#title
+            input(type="text", name="title", value=(editing || hasError ? product.title : ""), class=(validationErrors.find(e => e.param == "title") ? "invalid" : ""))#title
         .form-control
             label(for="imageUrl") Image URL
-            input(type="text", name="imageUrl", value=(editing === "true" ? product.imageUrl : ""))#imageUrl
+            input(type="text", name="imageUrl", value=(editing || hasError ? product.imageUrl : ""), class=(validationErrors.find(e => e.param == "imageUrl") ? "invalid" : ""))#imageUrl
         .form-control
             label(for="price") Price
-            input(type="number", name="price", step="0.01", value=(editing === "true" ? product.price : ""))#price
+            input(type="number", name="price", step="0.01", value=(editing || hasError ? product.price : ""), class=(validationErrors.find(e => e.param == "price") ? "invalid" : ""))#price
         .form-control
             label(for="description") Description
-            textarea(name="description", rows=5)#description #{editing === "true" ? product.description : ""}
+            textarea(name="description", rows=5, class=(validationErrors.find(e => e.param == "description") ? "invalid" : ""))#description #{editing || hasError ? product.description : ""}
         if editing
             input(type="hidden", value=product._id, name="productId")
         input(type="hidden", name="_csrf", value=csrfToken)
-        button.btn(type="submit") #{editing === "true" ? "Update product" : "Add product"}
+        button.btn(type="submit") #{editing ? "Update product" : "Add product"}

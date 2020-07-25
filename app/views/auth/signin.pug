@@ -7,13 +7,13 @@ block styles
 block content
     if errorMessage
         .user-message.user-message--error #{errorMessage}
-    form.login-form(action="/signin", method="POST")
+    form.login-form(action="/signin", method="POST", novalidate)
         .form-control
             label(for="email") E-Mail
-            input(type="email", name="email")#email
+            input(type="email", name="email", value=oldInput.email, class=(validationErrors.find(e => e.param == "email") ? "invalid" : ""))#email
         .form-control
             label(for="password") Password
-            input(type="password", name="password")#password
+            input(type="password", name="password", value=oldInput.password, class=(validationErrors.find(e => e.param == "password") ? "invalid" : ""))#password
         button.btn(type="submit") Sign in
         input(type="hidden", name="_csrf", value=csrfToken)
         a.btn(href="/reset") Reset password

@@ -7,15 +7,15 @@ block styles
 block content
     if errorMessage
         .user-message.user-message--error #{errorMessage}
-    form.login-form(action="/signup", method="POST")
+    form.login-form(action="/signup", method="POST", novalidate)
         .form-control
             label(for="email") E-Mail
-            input(type="email", name="email")#email
+            input(type="email", name="email", value=oldInput.email, class=(validationErrors.find(e => e.param == "email") ? "invalid" : ""))#email
         .form-control
             label(for="password") Password
-            input(type="password", name="password")#password
+            input(type="password", name="password", value=oldInput.password, class=(validationErrors.find(e => e.param == "password") ? "invalid" : ""))#password
         .form-control
             label(for="confirmPassword") Confirm password
-            input(type="password", name="confirmPassword")#confirmPassword
+            input(type="password", name="confirmPassword", value=oldInput.confirmPassword, class=(validationErrors.find(e => e.param == "confirmPassword") ? "invalid" : ""))#confirmPassword
         button.btn(type="submit") Sign up
         input(type="hidden", name="_csrf", value=csrfToken)
