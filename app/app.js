@@ -42,7 +42,13 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
+app.get("/500", errorController.get500);
+
 app.use(errorController.get404);
+
+app.use((error, req, res, next) => {
+  res.redirect("/500");
+});
 
 mongoose.connect("mongodb://localhost:27017/shop").then(() => {
   app.listen(3000);
