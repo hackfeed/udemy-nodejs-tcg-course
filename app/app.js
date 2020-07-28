@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const MongodbStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 const flash = require("connect-flash");
+const multer = require("multer");
 
 const errorController = require("./controllers/error");
 
@@ -17,6 +18,25 @@ const store = new MongodbStore({
 });
 const csrfProtection = csrf();
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "public/images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + "-" + file.originalname);
+  },
+});
+
+const mimeWhitelist = ["image/png", "image/jpg", "image/jpeg"];
+
+const fileFilter = (req, file, cb) => {
+  if (mimeWhitelist.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 app.set("view engine", "pug");
 app.set("views", "views");
 
@@ -25,6 +45,7 @@ const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single("image"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({ secret: "mysecretflexing", resave: false, saveUninitialized: false, store: store })
@@ -47,6 +68,7 @@ app.get("/500", errorController.get500);
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
+  console.log(error);
   res.redirect("/500");
 });
 

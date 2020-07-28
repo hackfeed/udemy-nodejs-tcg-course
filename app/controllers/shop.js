@@ -1,3 +1,8 @@
+const fs = require("fs");
+const path = require("path");
+
+const PDFDocument = require("pdfkit");
+
 const Product = require("../models/product");
 const Order = require("../models/order");
 const User = require("../models/user");
@@ -156,4 +161,49 @@ exports.getCheckout = (req, res, next) => {
     pageTitle: "Checkout",
     path: "/checkout",
   });
+};
+
+exports.getInvoice = (req, res, next) => {
+  const orderId = req.params.orderId;
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
+        return next(new Error("No order found"));
+      }
+      if (order.user.userId.toString() !== req.session.user._id.toString()) {
+        return next(new Error("Unautrhorized"));
+      }
+      const invoiceName = "invoice-" + orderId + ".pdf";
+      const invoicePath = path.join("data", "invoices", invoiceName);
+
+      const pdfDoc = new PDFDocument();
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `inline; filename=${invoiceName}`);
+      pdfDoc.pipe(fs.createWriteStream(invoicePath));
+      pdfDoc.pipe(res);
+
+      pdfDoc.fontSize(26).text("Invoice", {
+        align: "center",
+      });
+      pdfDoc.text("--------------------", {
+        align: "center",
+      });
+
+      let totalPrice = 0;
+      order.products.forEach((prod) => {
+        totalPrice += prod.quantity * prod.productData.price;
+        pdfDoc
+          .fontSize(14)
+          .text(prod.productData.title + " - " + prod.quantity + " x $" + prod.productData.price);
+      });
+      pdfDoc.fontSize(26).text("--------------------", {
+        align: "center",
+      });
+      pdfDoc.fontSize(20).text("Total price: $" + totalPrice, {
+        align: "center",
+      });
+
+      pdfDoc.end();
+    })
+    .catch((err) => next(err));
 };
