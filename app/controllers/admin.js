@@ -69,7 +69,7 @@ exports.postAddProduct = (req, res, next) => {
         price: price,
         description: description,
       },
-      errorMessage: "Attached file is not an image.",
+      errorMessage: "Some error occured.",
       validationErrors: [],
     });
   }
