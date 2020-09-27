@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const stripe = require("stripe")("test");
 
 const PDFDocument = require("pdfkit");
 
@@ -192,21 +193,38 @@ exports.getOrders = (req, res, next) => {
 };
 
 exports.getCheckout = (req, res, next) => {
+  let products;
+  let total = 0;
+
   User.findById(req.session.user._id).then((user) => {
     user
       .populate("cart.items.productId")
       .execPopulate()
       .then((user) => {
-        const products = user.cart.items;
-        let total = 0;
+        products = user.cart.items;
         products.forEach((p) => {
           total += p.quantity * p.productId.price;
         });
+        return stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+          line_items: products.map((p) => ({
+            name: p.productId.title,
+            description: p.productId.description,
+            amount: p.productId.price * 100,
+            currency: "usd",
+            quantity: p.quantity,
+          })),
+          success_url: `${req.protocol}://${req.get("host")}/checkout/success`,
+          cancel_url: `${req.protocol}://${req.get("host")}/checkout/cancel`,
+        });
+      })
+      .then((session) => {
         res.render("shop/checkout", {
           pageTitle: "Checkout",
           path: "/checkout",
           products: products,
           totalSum: total,
+          sessionId: session.id,
         });
       })
       .catch((err) => {

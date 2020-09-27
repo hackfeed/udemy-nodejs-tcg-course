@@ -12,5 +12,16 @@ block content
                     h2 Quantity: #{product.quantity}
         div.centered
             h2 Total: #{totalSum}
+        div.centered
+            button.btn#order-btn ORDER
+            script(src="https://js.stripe.com/v3/")
+            script.
+                var stripe = Stripe('test');
+                var orderbtn = document.getElementById('order-btn');
+                orderBtn.addEventListener('click', function() {
+                    stripe.redirectToCheckout({
+                        sessionId: sessiondId
+                    });
+                });
     else
         h1 No Products in Checkout!
