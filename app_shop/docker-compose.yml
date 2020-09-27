@@ -6,10 +6,8 @@ services:
       context: .
     container_name: appudemy
     command: npm start
-    # env_file:
-    #   - .env
     volumes:
-      - ./app:/app
+      - .:/app
     ports:
       - 3000:3000
     depends_on:
@@ -18,8 +16,6 @@ services:
   db:
     image: mongo:4.4
     container_name: mongodbudemy
-    # env_file:
-    #   - .env
     volumes:
       - ./data/db:/data/db
     ports:
