@@ -16,8 +16,9 @@ block content
                         input(type="hidden", name="_csrf", value=csrfToken)
         hr
         .centered
-            form(action="/create-order", method="POST")
-                button.btn(type="submit") Order Now!
-                input(type="hidden", name="_csrf", value=csrfToken)
+            //- form(action="/create-order", method="POST")
+            //-     button.btn(type="submit") Order Now!
+            //-     input(type="hidden", name="_csrf", value=csrfToken)
+            a.btn(href="/checkout") Order Now!
     else
         h1 No Products in Cart!

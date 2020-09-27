@@ -105,3 +105,6 @@ dist
 
 # Images
 images/
+
+# Database data
+data/db

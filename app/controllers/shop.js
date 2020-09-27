@@ -192,9 +192,28 @@ exports.getOrders = (req, res, next) => {
 };
 
 exports.getCheckout = (req, res, next) => {
-  res.render("shop/checkout", {
-    pageTitle: "Checkout",
-    path: "/checkout",
+  User.findById(req.session.user._id).then((user) => {
+    user
+      .populate("cart.items.productId")
+      .execPopulate()
+      .then((user) => {
+        const products = user.cart.items;
+        let total = 0;
+        products.forEach((p) => {
+          total += p.quantity * p.productId.price;
+        });
+        res.render("shop/checkout", {
+          pageTitle: "Checkout",
+          path: "/checkout",
+          products: products,
+          totalSum: total,
+        });
+      })
+      .catch((err) => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+      });
   });
 };
 

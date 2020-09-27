@@ -13,7 +13,7 @@ const errorController = require("./controllers/error");
 
 const app = express();
 const store = new MongodbStore({
-  uri: "mongodb://localhost:27017/shop",
+  uri: "mongodb://db:27017/shop",
   collection: "sessions",
 });
 const csrfProtection = csrf();
@@ -72,6 +72,6 @@ app.use((error, req, res, next) => {
   res.redirect("/500");
 });
 
-mongoose.connect("mongodb://localhost:27017/shop").then(() => {
+mongoose.connect("mongodb://db:27017/shop").then(() => {
   app.listen(3000);
 });
