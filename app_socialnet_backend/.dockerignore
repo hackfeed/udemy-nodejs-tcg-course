@@ -1,0 +1,10 @@
+# Database data
+data/db
+
+# Docker files
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Node modules
+node_modules/
