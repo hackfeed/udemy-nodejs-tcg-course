@@ -1,5 +1,5 @@
 # Docker files
-**/Dockerfile
+Dockerfile
 
 # Node modules
 node_modules/
