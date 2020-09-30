@@ -1,5 +1,5 @@
 {
-  "name": "node-complete-social-network-prep",
+  "name": "socialnet_frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
