@@ -1,23 +1,24 @@
-import React, { Component, Fragment } from 'react';
-import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
+import './App.css';
 
-import Layout from './components/Layout/Layout';
+import React, { Component, Fragment } from 'react';
+import { Redirect, Route, Switch, withRouter } from 'react-router-dom';
+
 import Backdrop from './components/Backdrop/Backdrop';
-import Toolbar from './components/Toolbar/Toolbar';
-import MainNavigation from './components/Navigation/MainNavigation/MainNavigation';
-import MobileNavigation from './components/Navigation/MobileNavigation/MobileNavigation';
 import ErrorHandler from './components/ErrorHandler/ErrorHandler';
 import FeedPage from './pages/Feed/Feed';
-import SinglePostPage from './pages/Feed/SinglePost/SinglePost';
+import Layout from './components/Layout/Layout';
 import LoginPage from './pages/Auth/Login';
+import MainNavigation from './components/Navigation/MainNavigation/MainNavigation';
+import MobileNavigation from './components/Navigation/MobileNavigation/MobileNavigation';
 import SignupPage from './pages/Auth/Signup';
-import './App.css';
+import SinglePostPage from './pages/Feed/SinglePost/SinglePost';
+import Toolbar from './components/Toolbar/Toolbar';
 
 class App extends Component {
   state = {
     showBackdrop: false,
     showMobileNav: false,
-    isAuth: true,
+    isAuth: false,
     token: null,
     userId: null,
     authLoading: false,
@@ -100,7 +101,17 @@ class App extends Component {
   signupHandler = (event, authData) => {
     event.preventDefault();
     this.setState({ authLoading: true });
-    fetch('URL')
+    fetch('http://localhost:8080/auth/signup', {
+      method: 'PUT', 
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: authData.signupForm.email.value,
+        password: authData.signupForm.password.value,
+        name: authData.signupForm.name.value
+      })
+    })
       .then(res => {
         if (res.status === 422) {
           throw new Error(
