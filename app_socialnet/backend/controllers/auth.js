@@ -34,7 +34,6 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  let loadedUser;
 
   try {
     const user = await User.findOne({ email });
@@ -45,8 +44,6 @@ exports.login = async (req, res, next) => {
       throw error;
     }
 
-    loadedUser = user;
-
     const isEqual = await bcrypt.compare(password, user.password);
 
     if (!isEqual) {
@@ -55,13 +52,11 @@ exports.login = async (req, res, next) => {
       throw error;
     }
 
-    const token = jwt.sign(
-      { email: loadedUser.email, userId: loadedUser._id.toString() },
-      "myflexsecret",
-      { expiresIn: "1h" }
-    );
+    const token = jwt.sign({ email: user.email, userId: user._id.toString() }, "myflexsecret", {
+      expiresIn: "1h",
+    });
 
-    res.status(200).json({ token, userId: loadedUser._id.toString() });
+    res.status(200).json({ token, userId: user._id.toString() });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -102,7 +97,6 @@ exports.updateUserStatus = async (req, res, next) => {
     }
 
     user.status = newStatus;
-
     await user.save();
 
     res.status(200).json({ message: "User status updated" });
