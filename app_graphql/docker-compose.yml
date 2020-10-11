@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontendsocialnetgql
+    command: npm start
+    volumes:
+      - ./frontend:/frontend
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+    container_name: backendsocialnetgql
+    command: npm start
+    volumes:
+      - ./backend:/backend
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+
+  db:
+    image: mongo:4.4
+    container_name: dbsocialnetgql
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
