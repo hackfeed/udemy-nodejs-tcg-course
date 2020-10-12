@@ -108,3 +108,7 @@ images/
 
 # Database data
 db/
+
+# TLS data
+*.cert
+*.key

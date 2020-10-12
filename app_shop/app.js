@@ -1,4 +1,6 @@
 const path = require("path");
+const fs = require("fs");
+// const https = require("https");
 
 const express = require("express");
 const session = require("express-session");
@@ -8,6 +10,9 @@ const MongodbStore = require("connect-mongodb-session")(session);
 const csrf = require("csurf");
 const flash = require("connect-flash");
 const multer = require("multer");
+const helmet = require("helmet");
+const compression = require("compression");
+const morgan = require("morgan");
 
 const errorController = require("./controllers/error");
 
@@ -17,6 +22,9 @@ const store = new MongodbStore({
   collection: "sessions",
 });
 const csrfProtection = csrf();
+
+// const privateKey = fs.readFileSync("server.key");
+// const certificate = fs.readFileSync("server.cert");
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -43,6 +51,12 @@ app.set("views", "views");
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
+
+const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), { flags: "a" });
+
+app.use(helmet());
+app.use(compression());
+app.use(morgan("combined", { stream: accessLogStream }));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single("image"));
@@ -73,5 +87,6 @@ app.use((error, req, res, next) => {
 });
 
 mongoose.connect("mongodb://db:27017/shop").then(() => {
-  app.listen(3000);
+  // https.createServer({ key: privateKey, cert: certificate }, app).listen(process.env.PORT || 3000);
+  app.listen(process.env.PORT || 3000);
 });
