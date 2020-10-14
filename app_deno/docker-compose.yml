@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  db:
+    image: mongo:4.4
+    container_name: dbdeno
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
